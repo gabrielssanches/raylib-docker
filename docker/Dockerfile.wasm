@@ -25,6 +25,12 @@ RUN mkdir -p $RAYLIB_SOURCE_DIR
 RUN git clone https://github.com/raysan5/raylib.git $RAYLIB_SOURCE_DIR
 RUN cd $RAYLIB_SOURCE_DIR && git checkout $RAYLIB_VERSION
 
+# raygui
+ENV RAYGUI_SOURCE_DIR /usr/local/src/raygui
+RUN mkdir -p $RAYGUI_SOURCE_DIR
+RUN git clone https://github.com/raysan5/raygui.git $RAYGUI_SOURCE_DIR
+RUN cd $RAYGUI_SOURCE_DIR
+
 # emscripten
 ENV EMSDK_VERSION 3.1.45
 ENV EMSDK_SOURCE_DIR /usr/local/src/emsdk
@@ -37,13 +43,15 @@ RUN cd $EMSDK_SOURCE_DIR && \
     ./emsdk activate $EMSDK_VERSION && \
     . ./emsdk_env.sh && \
     cd $RAYLIB_SOURCE_DIR/src && \
-    make PLATFORM=PLATFORM_WEB -B && make install
+    make PLATFORM=PLATFORM_WEB RAYLIB_MODULE_RAYGUI=TRUE -B && \
+    make install && \
+    cp $RAYGUI_SOURCE_DIR/src/raygui.h /usr/local/include
 
 COPY entrypoint-wasm.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
 
-RUN groupadd -r rey -g $GID && \
-    useradd -u $UID -r -g rey -s /bin/bash -c "raylib user" rey
+RUN groupadd -r ray -g $GID && \
+    useradd -u $UID -r -g ray -s /bin/bash -c "raylib user" ray
 
-USER rey
+USER ray
 WORKDIR /game
