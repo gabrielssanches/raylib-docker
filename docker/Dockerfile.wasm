@@ -17,6 +17,8 @@ RUN apt-get update && \
     libxcursor-dev \
     libxinerama-dev
 
+RUN apt-get install -y \
+    zip
 
 # raylib
 ENV RAYLIB_VERSION 5.0
