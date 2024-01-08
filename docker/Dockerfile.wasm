@@ -45,7 +45,7 @@ RUN cd $EMSDK_SOURCE_DIR && \
     ./emsdk activate $EMSDK_VERSION && \
     . ./emsdk_env.sh && \
     cd $RAYLIB_SOURCE_DIR/src && \
-    make PLATFORM=PLATFORM_WEB RAYLIB_MODULE_RAYGUI=TRUE -B && \
+    make PLATFORM=PLATFORM_WEB RAYLIB_MODULE_RAYGUI=TRUE BUILD_MODE=RELEASE -B && \
     make install && \
     cp $RAYGUI_SOURCE_DIR/src/raygui.h /usr/local/include
 
