@@ -1,5 +1,4 @@
-# Use the official GCC image as the base image
-FROM gcc:11.3.0
+FROM ubuntu:22.04
 
 ARG UID=1000
 ARG GID=1000
@@ -8,6 +7,8 @@ ARG GID=1000
 RUN apt-get update && \
     apt-get install -y \
     build-essential \
+    git \
+    vim \
     libx11-dev \
     libxrandr-dev \
     libxi-dev \
@@ -22,21 +23,21 @@ RUN apt-get update && \
 ENV RAYLIB_VERSION 5.0
 ENV RAYLIB_SOURCE_DIR /usr/local/src/raylib
 RUN mkdir -p $RAYLIB_SOURCE_DIR
-RUN git clone https://github.com/raysan5/raylib.git $RAYLIB_SOURCE_DIR
-RUN cd $RAYLIB_SOURCE_DIR && git checkout $RAYLIB_VERSION
+RUN git clone https://github.com/raysan5/raylib.git $RAYLIB_SOURCE_DIR -b $RAYLIB_VERSION
+RUN cd $RAYLIB_SOURCE_DIR
 
 # raygui
 ENV RAYGUI_SOURCE_DIR /usr/local/src/raygui
+ENV RAYGUI_COMMIT 141ae0cd312656b7764b01079e43fc887aaaf4ce
 RUN mkdir -p $RAYGUI_SOURCE_DIR
-RUN git clone https://github.com/raysan5/raygui.git $RAYGUI_SOURCE_DIR
-RUN cd $RAYGUI_SOURCE_DIR
+RUN git clone https://github.com/raysan5/raygui.git $RAYGUI_SOURCE_DIR && \
+    cd $RAYGUI_SOURCE_DIR && \
+    git checkout $RAYGUI_COMMIT
 
 # compile raylib gnu linux
 RUN cd $RAYLIB_SOURCE_DIR/src && \
     make clean && \
-    make -j PLATFORM=PLATFORM_DESKTOP RAYLIB_MODULE_RAYGUI=TRUE -B && \
-    make install && \
-    cp $RAYGUI_SOURCE_DIR/src/raygui.h /usr/local/include
+    make -j PLATFORM=PLATFORM_DESKTOP RAYLIB_MODULE_RAYGUI=TRUE -B
 
 COPY entrypoint-linux_x64.sh /usr/local/bin/entrypoint.sh
 RUN chmod +x /usr/local/bin/entrypoint.sh
