@@ -7,6 +7,7 @@ ARG GID=1000
 RUN apt-get update && \
     apt-get install -y \
     build-essential \
+    cmake \
     git \
     python3 \
     libx11-dev \
@@ -16,17 +17,19 @@ RUN apt-get update && \
     libglu1-mesa-dev \
     libasound2-dev \
     libxcursor-dev \
-    libxinerama-dev
-
-RUN apt-get install -y \
+    libxinerama-dev \
+    wget \
     zip
 
 # raylib
 ENV RAYLIB_VERSION 5.0
 ENV RAYLIB_SOURCE_DIR /usr/local/src/raylib
 RUN mkdir -p $RAYLIB_SOURCE_DIR
-RUN git clone https://github.com/raysan5/raylib.git $RAYLIB_SOURCE_DIR -b $RAYLIB_VERSION
-RUN cd $RAYLIB_SOURCE_DIR
+RUN cd /tmp && wget https://github.com/raysan5/raylib/archive/refs/tags/5.0.tar.gz
+RUN cd /tmp && tar -xvf 5.0.tar.gz
+RUN mv /tmp/raylib-5.0/* $RAYLIB_SOURCE_DIR
+COPY raylib.diff $RAYLIB_SOURCE_DIR
+RUN cd $RAYLIB_SOURCE_DIR && git apply raylib.diff
 
 # raygui
 ENV RAYGUI_SOURCE_DIR /usr/local/src/raygui
